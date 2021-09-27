@@ -42,9 +42,9 @@ export default withTracker(() => {
 
   const { pollTypes } = Service;
 
-  const startPoll = (type, secretPoll, question = '') => makeCall('startPoll', pollTypes, type, pollId, secretPoll, question);
+  const startPoll = (type, secretPoll, choiceNum, question = '') => makeCall('startPoll', pollTypes, type, pollId, secretPoll,choiceNum, question);
 
-  const startCustomPoll = (type, secretPoll, question = '', answers) => makeCall('startPoll', pollTypes, type, pollId, secretPoll, question, answers);
+  const startCustomPoll = (type, secretPoll, choiceNum, question = '', answers) => makeCall('startPoll', pollTypes, type, pollId, secretPoll, choiceNum, question, answers);
 
   const stopPoll = () => makeCall('stopPoll');
 

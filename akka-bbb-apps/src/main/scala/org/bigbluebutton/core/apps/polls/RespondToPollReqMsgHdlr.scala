@@ -49,6 +49,7 @@ trait RespondToPollReqMsgHdlr {
       (pollId: String, updatedPoll: SimplePollResultOutVO) <- Polls.handleRespondToPollReqMsg(msg.header.userId, msg.body.pollId,
         msg.body.questionId, msg.body.answerId, liveMeeting)
     } yield {
+      log.debug("updatedPoll  {}", updatedPoll)
       broadcastPollUpdatedEvent(msg, pollId, updatedPoll)
       for {
         poll <- Polls.getPoll(pollId, liveMeeting.polls)

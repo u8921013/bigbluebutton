@@ -4,7 +4,7 @@ import Logger from '/imports/startup/server/logger';
 import flat from 'flat';
 import { check } from 'meteor/check';
 
-export default function addPoll(meetingId, requesterId, poll, pollType, secretPoll, question = '') {
+export default function addPoll(meetingId, requesterId, poll, pollType, secretPoll,choiceNum, question = '') {
   check(requesterId, String);
   check(meetingId, String);
   check(poll, {
@@ -37,7 +37,7 @@ export default function addPoll(meetingId, requesterId, poll, pollType, secretPo
     { meetingId },
     { requester: requesterId },
     { users: userIds },
-    { question, pollType, secretPoll },
+    { question, pollType, secretPoll,choiceNum },
     flat(poll, { safe: true }),
   );
 

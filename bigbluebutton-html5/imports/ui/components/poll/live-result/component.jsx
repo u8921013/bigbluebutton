@@ -63,9 +63,10 @@ class LiveResult extends PureComponent {
 
     const currentPollQuestion = (currentPoll.question) ? currentPoll.question : '';
 
-    let userAnswers = responses
+    let tmpUserAnswers = responses
       ? [...users, ...responses.map(u => u.userId)]
       : [...users];
+    let userAnswers=tmpUserAnswers.filter((value, index, self)=>self.indexOf(value) === index);
 
     userAnswers = userAnswers.map(id => usernames[id])
       .map((user) => {
@@ -74,6 +75,10 @@ class LiveResult extends PureComponent {
         if (responses) {
           const response = responses.find(r => r.userId === user.userId);
           if (response) answer = answers[response.answerId].key;
+           const userList = responses.filter(r => r.userId === user.userId); 
+           if(userList){
+               answer=userList.map(u=>answers[u.answerId].key).join(","); 
+           }
         }
 
         return {

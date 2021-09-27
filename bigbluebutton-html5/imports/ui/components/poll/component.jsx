@@ -215,6 +215,7 @@ class Poll extends Component {
 
     this.state = {
       isPolling: false,
+      choiceNum:1,
       question: '',
       optList: [],
       error: null,
@@ -227,7 +228,9 @@ class Poll extends Component {
     this.handleTextareaChange = this.handleTextareaChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.displayToggleStatus = this.displayToggleStatus.bind(this);
-  }
+    this.handleChoiceNumChange = this.handleChoiceNumChange.bind(this);  
+ 
+}
 
   componentDidMount() {
     const { props } = this.hideBtn;
@@ -458,9 +461,15 @@ class Poll extends Component {
     );
   }
 
+
+  handleChoiceNumChange(event) {
+    console.log(event.target.value); 
+    this.setState({ choiceNum: event.target.value });
+  } 
+ 
   renderPollOptions() {
     const {
-      type, secretPoll, optList, question, error,
+      type,choiceNum, secretPoll, optList, question, error,
     } = this.state;
     const {
       startPoll,
@@ -470,6 +479,7 @@ class Poll extends Component {
       isDefaultPoll,
       checkPollType,
     } = this.props;
+    console.log("choiceNum==>"+choiceNum);
     const defaultPoll = isDefaultPoll(type);
     return (
       <div>
@@ -562,7 +572,7 @@ class Poll extends Component {
               label={intl.formatMessage(intlMessages.userResponse)}
               aria-describedby="poll-config-button"
               color="default"
-              onClick={() => { this.setState({ type: pollTypes.Response }); }}
+              onClick={() => { this.setState({ choiceNum:1,type: pollTypes.Response }); }}
               className={
               cx(styles.pBtn, styles.fullWidth, {
                 [styles.selectedBtnWhite]: type === pollTypes.Response,
@@ -632,14 +642,38 @@ class Poll extends Component {
                         </label>
                       </div>
                     </div>
-                    <div>
+                   <div>
                       {
                         intl.formatMessage(secretPoll
                           ? intlMessages.isSecretPollLabel
                           : intlMessages.nonSecretPollLabel)
                       }
                     </div>
-                    <Button
+                    {
+                      type != pollTypes.Response&&(
+                    <div className={styles.row}>
+                       <div className={styles.col} aria-hidden="true">
+                          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                        <label className={styles.label}>
+                          是否複選:
+                        </label>
+                      </div>
+                      <div className={styles.col}>
+                        <select
+                  aria-label="是否複選"
+                  className={styles.select}
+                  onChange={this.handleChoiceNumChange}
+                  defaultValue={choiceNum}
+                >
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+              </select>
+                          </div>
+                </div>
+               )
+                    } 
+               <Button
                       className={styles.startPollBtn}
                       data-test="startPoll"
                       label={intl.formatMessage(intlMessages.startPollLabel)}
@@ -677,11 +711,12 @@ class Poll extends Component {
                             startCustomPoll(
                               verifiedPollType,
                               secretPoll,
+                              choiceNum,
                               question,
                               _.compact(verifiedOptions),
                             );
                           } else {
-                            startPoll(verifiedPollType, secretPoll, question);
+                            startPoll(verifiedPollType, secretPoll,choiceNum, question);
                           }
                         });
                       }}
