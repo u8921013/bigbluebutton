@@ -327,9 +327,16 @@ class LearningDashboardActor(
         }
       } else {
         //Store Public Poll in `user.answers`
-        val updatedUser = user.copy(answers = user.answers + (msg.body.pollId -> msg.body.answer))
-        val updatedMeeting = meeting.copy(users = meeting.users + (updatedUser.intId -> updatedUser))
-        meetings += (updatedMeeting.intId -> updatedMeeting)
+        if(user.answers.contains(msg.body.pollId)){
+          val finalPollResult=user.answers(msg.body.pollId).concat(",").concat(msg.body.answer)
+          val updatedUser = user.copy(answers = user.answers + (msg.body.pollId -> finalPollResult))
+          val updatedMeeting = meeting.copy(users = meeting.users + (updatedUser.intId -> updatedUser))
+          meetings += (updatedMeeting.intId -> updatedMeeting)
+        }else{
+          val updatedUser = user.copy(answers = user.answers + (msg.body.pollId -> msg.body.answer))
+          val updatedMeeting = meeting.copy(users = meeting.users + (updatedUser.intId -> updatedUser))
+          meetings += (updatedMeeting.intId -> updatedMeeting)
+        }        
       }
     }
   }
