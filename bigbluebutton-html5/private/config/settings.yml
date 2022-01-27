@@ -26,12 +26,12 @@ public:
     # "media.setsinkid.enabled" to make it work properly
     # enableDynamicAudioDeviceSelection: true
     #
-    clientTitle: BigBlueButton
-    appName: BigBlueButton HTML5 Client
+    clientTitle: 線上同步授課 
+    appName: 
     bbbServerVersion: 2.4
-    copyright: '©2021 BigBlueButton Inc.'
-    html5ClientBuild: HTML5_CLIENT_VERSION
-    helpLink: https://bigbluebutton.org/html5/
+    copyright: '©2021 .'
+    html5ClientBuild: 2277
+    helpLink: 
     lockOnJoin: true
     cdn: ''
     basename: '/html5client'
@@ -191,7 +191,7 @@ public:
   externalVideoPlayer:
     enabled: true
   kurento:
-    wsUrl: HOST
+    wsUrl: wss://vroom.ubn.tc/bbb-webrtc-sfu
     # Valid for video-provider. Time (ms) before its WS connection times out
     # and tries to reconnect.
     wsConnectionTimeout: 4000
@@ -207,7 +207,7 @@ public:
     screenshare:
       # Experimental. True is the canonical behavior. Flip to false to reverse
       # the negotiation flow for subscribers.
-      subscriberOffering: false
+      subscriberOffering: true
       # Experimental. Server wide configuration to choose which bbb-webrtc-sfu
       # media server adapter should be used for screen sharing.
       # Default is undefined, which means the default setting in bbb-webrtc-sfu
@@ -228,9 +228,9 @@ public:
             ideal: 5
             max: 10
           width:
-            max: 2560
+            max: 1080
           height:
-            max: 1600
+            max: 768
         audio: true
     # cameraProfiles is an array of:
     # - id: profile identifier
@@ -455,42 +455,12 @@ public:
     moderatorChatEmphasized: true
   note:
     enabled: true
-    url: ETHERPAD_HOST
+    url: https://vroom.ubn.tc/pad
   layout:
     autoSwapLayout: false
     hidePresentation: false
     showParticipantsOnLogin: true
   media:
-    audio:
-      #
-      #
-      # Default bridge to be used by full audio mechanism.
-      # This is the bridge's name as contained in 'bridges' array
-      defaultFullAudioBridge: sipjs
-      #
-      #
-      # Same as above, but for listen only mechanism
-      defaultListenOnlyBridge: kurento
-      #
-      #
-      # Bridge array, here's where we list our bridges.
-      # To add new bridges, simply add the corresponding .js file in
-      # /imports/api/audio/client/bridge/ and add it to this list.
-      #
-      # Each bridge in this list, must have a name and path attribute.
-      # The name is the desired name/string you can set for your bridge, while
-      # the path specifies the file path, relative to
-      # '/imports/api/audio/client' dir.
-      #
-      bridges:
-          #
-          # The name of the bridge
-        - name: sipjs
-          #
-          # The bridge file path , relative to /imports/api/audio/client
-          path: 'bridge/sip'
-        - name: kurento
-          path: 'bridge/kurento'
     stunTurnServersFetchAddress: '/bigbluebutton/api/stuns'
     cacheStunTurnServers: true
     fallbackStunServer: ''
@@ -503,13 +473,13 @@ public:
     listenOnlyCallTimeout: 25000
     # Experimental. True is the canonical behavior. Flip to false to reverse
     # the negotiation flow for LO subscribers.
-    listenOnlyOffering: false
+    listenOnlyOffering: true
     #Timeout (ms) for gathering ICE candidates. When this timeout expires
     #the SDP is sent to the server with the candidates the browser gathered
     #so far. Increasing this value might help avoiding 1004 error when
     #user activates microphone.
     iceGatheringTimeout: 5000
-    sipjsHackViaWs: false
+    sipjsHackViaWs: true
     # Mute/umute toggle throttle time
     toggleMuteThrottleTime: 300
     #Websocket keepAlive interval (seconds). You may set this to prevent
@@ -717,7 +687,7 @@ private:
     pencilChunkLength: 100
     loadSlidesFromHttpAlways: false
   etherpad:
-    apikey: ETHERPAD_APIKEY
+    apikey: tJxIDFuvJoHmqFP1FOreMWqc3ejcHepO2tK7eTBQb2ohnUJpQ74G2kTJiOKDKs
     version: 1.2.13
     host: 127.0.0.1
     port: 9001
