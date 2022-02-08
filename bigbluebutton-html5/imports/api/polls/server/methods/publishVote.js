@@ -4,7 +4,7 @@ import Polls from '/imports/api/polls';
 import Logger from '/imports/startup/server/logger';
 import { extractCredentials } from '/imports/api/common/server/helpers';
 
-export default function publishVote(pollId, pollAnswerId) {
+export default function publishVote(pollId, pollAnswerId,salt) {
   try {
     const REDIS_CONFIG = Meteor.settings.private.redis;
     const CHANNEL = REDIS_CONFIG.channels.toAkkaApps;
@@ -26,10 +26,6 @@ export default function publishVote(pollId, pollAnswerId) {
       },
     });
 
-    if (!allowedToVote) {
-      Logger.info(`Poll User={${requesterUserId}} has already voted in PollId={${pollId}}`);
-      return null;
-    }
 
     const selector = {
       users: requesterUserId,
@@ -57,11 +53,9 @@ export default function publishVote(pollId, pollAnswerId) {
 
     const numberAffected = Polls.update(selector, modifier);
 
-    if (numberAffected) {
       Logger.info(`Removed responded user=${requesterUserId} from poll (meetingId: ${meetingId}, pollId: ${pollId}!)`);
 
       RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
-    }
   } catch (err) {
     Logger.error(`Exception while invoking method publishVote ${err.stack}`);
   }

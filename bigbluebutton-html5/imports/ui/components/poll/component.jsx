@@ -207,6 +207,7 @@ class Poll extends Component {
 
     this.state = {
       isPolling: false,
+      choiceNum:1,
       question: '',
       optList: [],
       error: null,
@@ -219,6 +220,8 @@ class Poll extends Component {
     this.handleTextareaChange = this.handleTextareaChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.displayToggleStatus = this.displayToggleStatus.bind(this);
+    this.handleChoiceNumChange = this.handleChoiceNumChange.bind(this); 
+
   }
 
   componentDidMount() {
@@ -463,9 +466,14 @@ class Poll extends Component {
     );
   }
 
+  handleChoiceNumChange(event) {
+    console.log(event.target.value); 
+    this.setState({ choiceNum: event.target.value });
+  } 
+
   renderPollOptions() {
     const {
-      type, secretPoll, optList, question, error,
+      type,choiceNum, secretPoll, optList, question, error,
     } = this.state;
     const {
       startPoll,
@@ -574,7 +582,7 @@ class Poll extends Component {
               label={intl.formatMessage(intlMessages.userResponse)}
               aria-describedby="poll-config-button"
               color="default"
-              onClick={() => { this.setState({ type: pollTypes.Response }); }}
+              onClick={() => { this.setState({ choiceNum: 1, type: pollTypes.Response }); }}
               className={
               cx(styles.pBtn, styles.fullWidth, {
                 [styles.selectedTypeBtn]: type === pollTypes.Response,
@@ -638,7 +646,30 @@ class Poll extends Component {
                         </label>
                       </div>
                     </div>
-                    {secretPoll
+                   {
+                      type != pollTypes.Response&&( 
+                    <div className={styles.row}>
+                      <div className={styles.col} aria-hidden="true">
+                        <h4 className={styles.sectionHeading}>
+                          是否複選:
+                        </h4>
+                      </div>
+                      <div className={styles.col}>
+                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                                                 <select
+                  aria-label="是否複選"
+                  className={styles.select}
+                  onChange={this.handleChoiceNumChange}
+                  defaultValue={choiceNum}
+                >
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+              </select> 
+                      </div>
+                    </div>
+                 )}
+                   {secretPoll
                       && (
                         <div className={styles.pollParagraph}>
                           { intl.formatMessage(intlMessages.isSecretPollLabel) }
@@ -682,11 +713,12 @@ class Poll extends Component {
                             startCustomPoll(
                               verifiedPollType,
                               secretPoll,
+                              choiceNum,
                               question,
                               _.compact(verifiedOptions),
                             );
                           } else {
-                            startPoll(verifiedPollType, secretPoll, question);
+                            startPoll(verifiedPollType, secretPoll, choiceNum,question);
                           }
                         });
                       }}

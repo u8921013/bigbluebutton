@@ -4,7 +4,7 @@ import setPublishedPoll from '../../../meetings/server/modifiers/setPublishedPol
 
 export default function pollStarted({ body }, meetingId) {
   const {
-    userId, poll, pollType, secretPoll, question,
+    userId, poll, pollType, secretPoll,choiceNum, question,
   } = body;
 
   check(meetingId, String);
@@ -16,5 +16,5 @@ export default function pollStarted({ body }, meetingId) {
 
   setPublishedPoll(meetingId, false);
 
-  return addPoll(meetingId, userId, poll, pollType, secretPoll, question);
+  return addPoll(meetingId, userId, poll, pollType, secretPoll,choiceNum, question);
 }

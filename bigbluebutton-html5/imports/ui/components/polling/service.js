@@ -4,8 +4,8 @@ import { debounce } from 'lodash';
 
 const MAX_CHAR_LENGTH = 5;
 
-const handleVote = (pollId, answerId) => {
-  makeCall('publishVote', pollId, answerId.id);
+const handleVote = (pollId, answerId,salt) => {
+  makeCall('publishVote', pollId, answerId.id,salt);
 };
 
 const handleTypedVote = (pollId, answer) => {
@@ -39,10 +39,11 @@ const mapPolls = () => {
       stackOptions,
       question: poll.question,
       secretPoll: poll.secretPoll,
+      choiceNum:poll.choiceNum, 
     },
     pollExists: true,
     amIRequester,
-    handleVote: debounce(handleVote, 500, { leading: true, trailing: false }),
+    handleVote:handleVote,
     handleTypedVote: debounce(handleTypedVote, 500, { leading: true, trailing: false }),
   };
 };

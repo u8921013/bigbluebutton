@@ -22,7 +22,14 @@
     margin-top: var(--sm-padding-y);
     margin-bottom: var(--sm-padding-y);
 }
-
+.select {
+  background-color: var(--color-white);
+  border-radius: 0.3rem;
+  color: var(--color-gray-label);
+  height: 1.6rem;
+  margin-top: 0.4rem;
+  width: 100%;
+}
 .hideBtn {
     position: relative;
     background-color: var(--color-white);

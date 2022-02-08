@@ -52,6 +52,7 @@ class Polling extends Component {
 
     this.state = {
       typedAns: '',
+      selectedPoll: [],
     };
 
     this.play = this.play.bind(this);
@@ -89,7 +90,32 @@ class Polling extends Component {
       handleTypedVote(poll.pollId, typedAns);
     }
   }
-
+  handleChoice(pollId,answer){
+    const { poll } = this.props;
+    const { selectedPoll } = this.state;
+    const {choiceNum} =poll; 
+    console.log('handleChioce:'+choiceNum); 
+    let filtered=selectedPoll.filter(poll=>poll.answer.id!=answer.id);
+    if(filtered.length<selectedPoll.length){
+       this.setState({ selectedPoll: filtered });
+       this.setState({ errorMsg: "還可選擇"+(choiceNum-filtered.length) });
+    }else{
+      if(selectedPoll.length==choiceNum){
+        this.setState({ errorMsg: "已經超過投票次數" });
+        return;
+      }
+      selectedPoll.push({pollId,answer,});
+      this.setState({ selectedPoll: selectedPoll,errorMsg: "還可選擇"+(choiceNum-selectedPoll.length) });
+    }
+  }; 
+  handleMultiVote(){
+    const { selectedPoll } = this.state;
+    const { handleVote } = this.props;
+    selectedPoll.forEach((poll,index)=>{
+          console.log(poll.pollId+","+ JSON.stringify(poll.answer));	
+          handleVote(poll.pollId, poll.answer,index)
+        });
+  }
   render() {
     const {
       isMeteorConnected,
@@ -100,10 +126,13 @@ class Polling extends Component {
       pollAnswerIds,
       pollTypes,
       isDefaultPoll,
+      choiceNum,
     } = this.props;
 
     const {
       typedAns,
+      selectedPoll,
+      errorMsg
     } = this.state;
 
     if (!poll) return null;
@@ -117,7 +146,7 @@ class Polling extends Component {
       [styles.stacked]: stackOptions,
     };
 
-    return (
+    return (poll.choiceNum==1)?(
       <div className={styles.overlay}>
         <div
           data-test="pollingContainer"
@@ -229,6 +258,133 @@ class Polling extends Component {
           </div>
         </div>
       </div>
+    ):(
+     <div className={styles.overlay}>
+        <div
+          data-test="pollingContainer"
+          className={cx({
+            [styles.pollingContainer]: true,
+            [styles.autoWidth]: stackOptions,
+          })}
+          role="alert"
+        >
+          {
+            question.length > 0 && (
+              <span className={styles.qHeader}>
+                <h2 className={styles.qTitle}>
+                  {intl.formatMessage(intlMessages.pollQuestionTitle)}
+                </h2>
+                <div data-test="pollQuestion" className={styles.qText}>{question}</div>
+              </span>
+            )
+          }
+          {
+            poll.pollType !== pollTypes.Response && (
+              <span>
+                {
+                  question.length === 0 && (
+                    <div className={styles.pollingTitle}>
+                      {intl.formatMessage(intlMessages.pollingTitleLabel)}
+                    </div>
+                  )
+                }
+                {
+                    errorMsg&&(<div>{errorMsg}</div>)
+                } 
+                <div className={cx(pollAnswerStyles)}>
+                  {poll.answers.map((pollAnswer) => {
+                    const formattedMessageIndex = pollAnswer?.key.toLowerCase();
+                    let label = pollAnswer.key;
+                    if (defaultPoll && pollAnswerIds[formattedMessageIndex]) {
+                      label = intl.formatMessage(pollAnswerIds[formattedMessageIndex]);
+                    }
+                    let isSelected=selectedPoll.filter(poll=>poll.answer.id==pollAnswer.id);
+                    console.log("isSelected="+isSelected); 
+                    return (
+                      <div
+                        key={pollAnswer.id}
+                        className={styles.pollButtonWrapper}
+                      >
+                        <Button
+                          disabled={!isMeteorConnected}
+                          className={styles.pollingButton}
+                          color={isSelected.length?"dark":"primary"}
+                          size="md"
+                          label={label}
+                          key={pollAnswer.key}
+                          onClick={() => this.handleChoice(poll.pollId, pollAnswer)}
+                          aria-labelledby={`pollAnswerLabel${pollAnswer.key}`}
+                          aria-describedby={`pollAnswerDesc${pollAnswer.key}`}
+                          data-test="pollAnswerOption"
+                        />
+                        <div
+                          className={styles.hidden}
+                          id={`pollAnswerLabel${pollAnswer.key}`}
+                        >
+                          {intl.formatMessage(intlMessages.pollAnswerLabel, { 0: label })}
+                        </div>
+                        <div
+                          className={styles.hidden}
+                          id={`pollAnswerDesc${pollAnswer.key}`}
+                        >
+                          {intl.formatMessage(intlMessages.pollAnswerDesc, { 0: label })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </span>
+            )
+          }
+          {
+            poll.pollType === pollTypes.Response
+            && (
+              <div className={styles.typedResponseWrapper}>
+                <input
+                  data-test="pollAnswerOption"
+                  onChange={(e) => {
+                    this.handleUpdateResponseInput(e);
+                  }}
+                  onKeyDown={(e) => {
+                    this.handleMessageKeyDown(e);
+                  }}
+                  type="text"
+                  className={styles.typedResponseInput}
+                  placeholder={intl.formatMessage(intlMessages.responsePlaceholder)}
+                  maxLength={MAX_INPUT_CHARS}
+                  ref={(r) => { this.responseInput = r; }}
+                />
+                <Button
+                  data-test="submitAnswer"
+                  className={styles.submitVoteBtn}
+                  disabled={typedAns.length === 0}
+                  color="primary"
+                  size="sm"
+                  label={intl.formatMessage(intlMessages.submitLabel)}
+                  aria-label={intl.formatMessage(intlMessages.submitAriaLabel)}
+                  onClick={() => {
+                    handleTypedVote(poll.pollId, typedAns);
+                  }}
+                />
+              </div>
+            )
+          }
+          <div className={styles.pollingSecret}>
+            {intl.formatMessage(poll.secretPoll ? intlMessages.responseIsSecret : intlMessages.responseNotSecret)}
+          </div>
+           <Button
+                    disabled={!isMeteorConnected}
+                    className={styles.pollingButton}
+                    color="primary"
+                    size="md"
+                    onClick={() => this.handleMultiVote()}
+                    label="送出選擇"
+                    aria-labelledby="送出選擇"
+                    aria-describedby="送出選擇"
+                  />
+         </div>
+      </div>
+   
     );
   }
 }
